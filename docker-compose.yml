@@ -1,0 +1,52 @@
+services:
+  backend:
+    container_name: rishort_backend
+    build: 
+      context: ./back
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./back:/app
+    env_file:
+      - ./back/.env
+    networks:
+      - app-network
+    depends_on:
+      - redis
+
+  frontend:
+    container_name: rishort_frontend
+    build:
+      context: ./front
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./front:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+    networks:
+      - app-network
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+    env_file:
+      - ./front/.env
+
+  redis:
+    container_name: rishort_redis
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+    networks:
+      - app-network
+    volumes:
+      - redis-data:/data
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  redis-data:
