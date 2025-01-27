@@ -1,5 +1,7 @@
 # RiShort - URL Shortener
 
+[![Tests](https://github.com/xhepi6/rishort/actions/workflows/tests.yml/badge.svg)](https://github.com/xhepi6/rishort/actions/workflows/tests.yml)
+
 RiShort is a modern URL shortener service built with FastAPI, Next.js, and Redis.
 
 ## Prerequisites

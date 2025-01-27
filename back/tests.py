@@ -1,6 +1,5 @@
-from unittest.mock import Mock, patch
-
 import pytest
+from fakeredis import FakeRedis
 from fastapi.testclient import TestClient
 from main import app
 from src.services import URLShortenerService
@@ -15,19 +14,16 @@ def client():
 
 
 @pytest.fixture
-def mock_redis():
-    """Fixture for mocking Redis"""
-    with patch("redis.Redis") as mock:
-        redis_instance = Mock()
-        mock.return_value = redis_instance
-        yield redis_instance
+def fake_redis():
+    """Fixture for fake Redis."""
+    return FakeRedis(decode_responses=True)
 
 
 @pytest.fixture
-def url_service(mock_redis):
-    """Fixture for URL shortener service with mocked Redis"""
+def url_service(fake_redis):
+    """Fixture for URL shortener service with fake Redis."""
     service = URLShortenerService()
-    service._redis = mock_redis
+    service._redis = fake_redis
     return service
 
 
@@ -44,7 +40,7 @@ def base_url():
 
 
 @pytest.fixture
-def short_url(client, test_url):
+def short_url(client, url_service, test_url):
     """Fixture that creates and returns a short URL"""
     response = client.post("/shorten", json={"long_url": test_url})
     return response.json()["short_url"]
@@ -61,10 +57,9 @@ def test_health_check(client):
 
 
 # URL Shortening Tests
-def test_create_short_url(client, test_url):
+def test_create_short_url(client, url_service, test_url):
     """Test URL shortening endpoint."""
     response = client.post("/shorten", json={"long_url": test_url})
-
     assert response.status_code == 200
     data = response.json()
     assert data["long_url"] == test_url
@@ -79,7 +74,7 @@ def test_invalid_url_input(client):
 
 
 # URL Redirection Tests
-def test_redirect_to_url(client, test_url, short_url):
+def test_redirect_to_url(client, url_service, test_url, short_url):
     """Test URL redirection."""
     short_code = short_url.split("/")[-1]
 
@@ -89,9 +84,8 @@ def test_redirect_to_url(client, test_url, short_url):
     assert response.headers["location"] == test_url
 
 
-def test_invalid_short_url(client, url_service, mock_redis):
+def test_invalid_short_url(client, url_service):
     """Test handling of invalid short URLs."""
-    mock_redis.get.return_value = None
     response = client.get("/invalid123", follow_redirects=False)
     assert response.status_code == 404
 
@@ -105,25 +99,17 @@ def test_short_code_generation(test_url):
     assert code1 != code2  # Should be different due to timestamp
 
 
-def test_url_service_operations(url_service, mock_redis, test_url, base_url):
+def test_url_service_operations(url_service, test_url, base_url):
     """Test URL service creation and retrieval operations."""
-    # Configure mock
-    mock_redis.setex.return_value = True
-    mock_redis.get.return_value = test_url
-
     # Test URL creation
     response = url_service.create_short_url(test_url, base_url)
     assert response.long_url == test_url
     assert response.short_url.startswith(base_url)
 
-    # Verify Redis setex was called
-    short_code = response.short_url.split("/")[-1]
-    mock_redis.setex.assert_called_once_with(short_code, 86400, test_url)
-
     # Test URL retrieval
+    short_code = response.short_url.split("/")[-1]
     retrieved_url = url_service.get_long_url(short_code)
     assert retrieved_url == test_url
-    mock_redis.get.assert_called_once_with(short_code)
 
 
 # CORS Tests
