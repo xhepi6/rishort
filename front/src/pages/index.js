@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import Head from 'next/head';
+import Head from "next/head";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 const MAX_RETRIES = 3;
@@ -23,24 +23,29 @@ export default function Home() {
     }
   };
 
-  const fetchWithRetry = useCallback(async (url, options, retries = MAX_RETRIES) => {
-    try {
-      const response = await fetch(url, options);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+  const fetchWithRetry = useCallback(
+    async (url, options, retries = MAX_RETRIES) => {
+      try {
+        const response = await fetch(url, options);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response;
+      } catch (error) {
+        if (retries > 0) {
+          setIsRetrying(true);
+          await new Promise((resolve) =>
+            setTimeout(resolve, Math.pow(2, MAX_RETRIES - retries) * 1000),
+          );
+          return fetchWithRetry(url, options, retries - 1);
+        }
+        throw error;
+      } finally {
+        setIsRetrying(false);
       }
-      return response;
-    } catch (error) {
-      if (retries > 0) {
-        setIsRetrying(true);
-        await new Promise(resolve => setTimeout(resolve, Math.pow(2, MAX_RETRIES - retries) * 1000));
-        return fetchWithRetry(url, options, retries - 1);
-      }
-      throw error;
-    } finally {
-      setIsRetrying(false);
-    }
-  }, []);
+    },
+    [],
+  );
 
   const handleUrlChange = (e) => {
     const url = e.target.value;
@@ -54,7 +59,7 @@ export default function Home() {
 
   const formatTimeRemaining = (seconds) => {
     const hours = Math.floor(seconds / 3600);
-    return `${hours} ${hours === 1 ? 'hour' : 'hours'}`;
+    return `${hours} ${hours === 1 ? "hour" : "hours"}`;
   };
 
   const handleSubmit = async (e) => {
@@ -106,12 +111,17 @@ export default function Home() {
     <>
       <Head>
         <title>RiShort</title>
-        <meta name="description" content="Transform long URLs into short, shareable links" />
+        <meta
+          name="description"
+          content="Transform long URLs into short, shareable links"
+        />
       </Head>
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-purple-100 flex items-center justify-center p-6">
         <div className="max-w-xl w-full bg-white rounded-2xl shadow-lg p-8">
           <div className="text-center mb-10">
-            <h1 className="text-5xl font-extrabold text-gray-900 mb-4">RiShort</h1>
+            <h1 className="text-5xl font-extrabold text-gray-900 mb-4">
+              RiShort
+            </h1>
             <p className="text-lg text-gray-700">
               Transform long URLs into short, shareable links
             </p>
@@ -119,7 +129,10 @@ export default function Home() {
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label htmlFor="url" className="block text-base font-medium text-gray-800 mb-2">
+              <label
+                htmlFor="url"
+                className="block text-base font-medium text-gray-800 mb-2"
+              >
                 Enter your URL
               </label>
               <input
@@ -128,15 +141,15 @@ export default function Home() {
                 required
                 placeholder="https://example.com/your-long-url"
                 className={`w-full px-4 py-3 rounded-lg border ${
-                  urlError ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-purple-500'
+                  urlError
+                    ? "border-red-500 focus:ring-red-500"
+                    : "border-gray-300 focus:ring-purple-500"
                 } focus:border-purple-500 text-gray-800 outline-none transition-all duration-200 shadow-sm`}
                 value={longUrl}
                 onChange={handleUrlChange}
               />
               {urlError && (
-                <p className="mt-2 text-sm text-red-600">
-                  {urlError}
-                </p>
+                <p className="mt-2 text-sm text-red-600">{urlError}</p>
               )}
             </div>
 
@@ -152,9 +165,25 @@ export default function Home() {
               {isLoading ? (
                 <span className="flex items-center justify-center">
                   {isRetrying ? "Retrying..." : "Shortening..."}
-                  <svg className="animate-spin ml-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  <svg
+                    className="animate-spin ml-2 h-5 w-5 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
                   </svg>
                 </span>
               ) : (
@@ -196,17 +225,17 @@ export default function Home() {
               </div>
               {expiresIn && (
                 <div className="mt-2 text-sm text-gray-600 flex items-center">
-                  <svg 
-                    className="w-4 h-4 mr-1" 
-                    fill="none" 
-                    stroke="currentColor" 
+                  <svg
+                    className="w-4 h-4 mr-1"
+                    fill="none"
+                    stroke="currentColor"
                     viewBox="0 0 24 24"
                   >
-                    <path 
-                      strokeLinecap="round" 
-                      strokeLinejoin="round" 
-                      strokeWidth={2} 
-                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" 
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
                     />
                   </svg>
                   Link expires in {formatTimeRemaining(expiresIn)}
