@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   nginx:
@@ -19,7 +19,7 @@ services:
 
   backend:
     container_name: rishort_backend_${NODE_ID:-1}
-    build: 
+    build:
       context: ./back
       dockerfile: Dockerfile.prod
     expose:
@@ -34,7 +34,7 @@ services:
       replicas: 3
       resources:
         limits:
-          cpus: '0.50'
+          cpus: "0.50"
           memory: 512M
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/"]
@@ -72,7 +72,7 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.30'
+          cpus: "0.30"
           memory: 512M
     healthcheck:
       test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
@@ -95,4 +95,4 @@ networks:
 
 volumes:
   redis-data:
-    driver: local 
+    driver: local

@@ -1,5 +1,8 @@
+"""Utility functions for URL shortening."""
+
 import hashlib
 import time
+
 
 def generate_short_code(url: str) -> str:
     """Generate a short code for a given URL."""

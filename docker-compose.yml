@@ -1,7 +1,7 @@
 services:
   backend:
     container_name: rishort_backend
-    build: 
+    build:
       context: ./back
       dockerfile: Dockerfile
     ports:

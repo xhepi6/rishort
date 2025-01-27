@@ -95,3 +95,8 @@ redis-data/
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# Exceptions
+!.pre-commit-config.yaml
+!.github/
+!setup.cfg

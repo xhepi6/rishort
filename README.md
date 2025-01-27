@@ -12,11 +12,13 @@ RiShort is a modern URL shortener service built with FastAPI, Next.js, and Redis
 RiShort uses a robust approach to generate and manage shortened URLs:
 
 1. **Short Code Generation**:
+
    - When a long URL is submitted, a unique 6-character code is generated
    - The code combines a timestamp-based hash and URL-specific elements
    - This ensures uniqueness while keeping codes short and readable
 
 2. **Storage and Retrieval**:
+
    - URLs are stored in Redis with a 24-hour expiration
    - Each shortened URL is automatically removed after 24 hours
    - Fast lookups and redirects using Redis as the backend store
@@ -24,6 +26,7 @@ RiShort uses a robust approach to generate and manage shortened URLs:
    - Redirects are handled using HTTP 307 (Temporary Redirect) status
 
 3. **URL Format**:
+
    ```
    Original: https://very-long-website.com/with/many/parameters?id=123
    Shortened: http://localhost:8000/abc123
@@ -40,6 +43,7 @@ RiShort uses a robust approach to generate and manage shortened URLs:
 ## Getting Started
 
 1. Clone the repository:
+
 ```bash
 git clone https://github.com/xhepi6/rishort
 cd rishort
@@ -48,12 +52,14 @@ cd rishort
 2. Set up environment variables:
 
 For the backend:
+
 ```bash
 cd back
 cp .env.example .env
 ```
 
 For the frontend:
+
 ```bash
 cd front
 cp .env.example .env
@@ -62,16 +68,19 @@ cp .env.example .env
 3. Run the application:
 
 For development:
+
 ```bash
 docker-compose up --build
 ```
 
 For production:
+
 ```bash
 docker-compose -f docker-compose.production.yml up --build
 ```
 
 The application will be available at:
+
 - Development:
   - Frontend: http://localhost:3000
   - Backend API: http://localhost:8000
@@ -81,6 +90,7 @@ The application will be available at:
 ## Environment Variables
 
 ### Backend (.env)
+
 ```env
 # Redis Settings
 REDIS_HOST=redis
@@ -97,6 +107,7 @@ BASE_URL=http://localhost:8000/
 ```
 
 ### Frontend (.env)
+
 ```env
 NEXT_PUBLIC_API_URL=http://localhost:8000
 ```
@@ -104,12 +115,14 @@ NEXT_PUBLIC_API_URL=http://localhost:8000
 ## Development vs Production
 
 ### Development Setup
+
 - Hot reloading for both frontend and backend
 - Volume mounting for local development
 - Redis without authentication
 - Direct service access
 
 ### Production Setup
+
 - Nginx reverse proxy with SSL termination
 - Load balancing for backend services
 - Redis with password authentication
